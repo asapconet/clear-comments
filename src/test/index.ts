@@ -4,13 +4,17 @@
 
 import { SupportedExtension } from "../config/constants";
 
-interface TestCase {
+export type TestCase = {
   name: string;
   input: string;
   expected: string;
   extension: SupportedExtension;
   preserveJSDoc?: boolean;
-}
+  customPatterns?: string[];
+  beforeEach?: (path: string, content: string) => void;
+  afterEach?: (path: string) => void;
+  testRestore?: boolean;
+};
 
 export const tests: TestCase[] = [
   {
@@ -155,5 +159,13 @@ export const tests: TestCase[] = [
     };
     return data; 
     }`,
+  },
+
+  {
+    name: "Restore brings back original file",
+    extension: ".ts",
+    input: `/* remove this */ const b: number = 2;`,
+    expected: `const b: number = 2;`,
+    testRestore: true,
   },
 ];

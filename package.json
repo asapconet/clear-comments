@@ -4,6 +4,9 @@
   "description": "A fast CLI tool to clear comments from your React/JavaScript projects",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
+  "bin": {
+    "clear-comments": "./dist/index.js"
+  },
   "scripts": {
     "build": "tsc",
     "dev": "tsc --watch",
@@ -34,6 +37,7 @@
   ],
   "files": [
     "dist/**/*",
+    "bin/**/*",
     "README.md",
     "LICENSE"
   ],

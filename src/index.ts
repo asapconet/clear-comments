@@ -1,3 +1,5 @@
+#!/usr/bin/env node
+
 import { clearComments } from "./core";
 import { loadConfig } from "./config/loader";
 import {

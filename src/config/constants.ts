@@ -13,6 +13,7 @@ export const EXCLUDE_PATTERNS = [
   "**/static/**",
   "**/.turbo/**",
   "**/.vscode/**",
+  "**/__test__/**",
 ] as const;
 
 export const DEFAULT_OPTIONS = {

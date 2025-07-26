@@ -2,7 +2,7 @@ export type CommentType = "single-line" | "multi-line" | "html" | "jsdoc";
 
 export interface ClearCommentsOptions {
   targetDir?: string;
-
+  preserveEmptyLines?: boolean;
   preserveJSDoc?: boolean;
   removeTypes?: CommentType[];
   customPatterns?: string[];
@@ -38,4 +38,5 @@ export interface CLIArgs {
   configPath?: string;
   help: boolean;
   restore?: string;
+  preserveEmptyLines: boolean;
 }

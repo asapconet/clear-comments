@@ -15,6 +15,7 @@ export function parseArgs(args: string[]): CLIArgs {
     configPath: getArgValue(args, "--config"),
     help: args.includes("--help") || args.includes("-h"),
     restore: getArgValue(args, "--restore"),
+    preserveEmptyLines: args.includes("--preserve-empty-lines"),
   };
 }
 
@@ -25,7 +26,7 @@ function getArgValue(args: string[], flag: string): string | undefined {
 
 export function showHelp(): void {
   console.log(`
-  ${get(":broom:")} Clear Comments v1.0.0
+  ${get(":broom:")} Clear Comments v0.1.2
 
 USAGE:
   clear-comments [directory] [options]
@@ -40,6 +41,8 @@ OPTIONS:
   --backup-dir      Backup directory (default: ./.backup)
   --config          Path to configuration file
   --restore <dir>   Restore files from backup directory
+  --preserve-empty-lines   Keep empty lines after comment removal
+
   -h, --help        Show this help message
 
 CONFIGURATION FILE:

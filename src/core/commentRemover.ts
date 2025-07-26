@@ -6,7 +6,8 @@ export function removeComments(
   content: string,
   fileExtension: SupportedExtension,
   removeTypes: CommentType[] = ["single-line", "multi-line", "html"],
-  customPatterns: string[] = []
+  customPatterns: string[] = [],
+  preserveEmptyLines: boolean = false
 ): string {
   let processedContent = content;
 
@@ -51,6 +52,13 @@ export function removeComments(
   }
 
   processedContent = processedContent.replace(COMMENT_PATTERNS.EMPTY_LINES, "");
+
+  if (!preserveEmptyLines) {
+    processedContent = processedContent.replace(
+      COMMENT_PATTERNS.EMPTY_LINES,
+      ""
+    );
+  }
 
   return processedContent;
 }

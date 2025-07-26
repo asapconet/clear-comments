@@ -9,6 +9,7 @@ export interface ConfigFile {
   backup?: boolean;
   backupDir?: string;
   verbose?: boolean;
+  preserveEmptyLines: boolean;
 }
 
 export const DEFAULT_CONFIG: ConfigFile = {
@@ -18,6 +19,7 @@ export const DEFAULT_CONFIG: ConfigFile = {
   excludePatterns: [],
   backup: false,
   backupDir: "./.backup",
+  preserveEmptyLines: false,
 };
 
 export function loadConfig(configPath?: string): ConfigFile {
@@ -35,7 +37,7 @@ export function loadConfig(configPath?: string): ConfigFile {
         const config = JSON.parse(configContent);
         return { ...DEFAULT_CONFIG, ...config };
       } catch (error) {
-        console.warn(`⚠️ Warning: No fit read config file: ${configFile}`);
+        console.warn(`⚠️ Warning: Cannot read config file: ${configFile}`);
       }
     }
   }
@@ -52,6 +54,8 @@ export function mergeConfigWithOptions(
     ...cliOptions,
     removeTypes: cliOptions.removeTypes || config.removeTypes,
     customPatterns: cliOptions.customPatterns || config.customPatterns,
+    preserveEmptyLines:
+      cliOptions.preserveEmptyLines ?? config.preserveEmptyLines ?? false,
     excludePatterns: [
       ...(config.excludePatterns || []),
       ...(cliOptions.excludePatterns || []),

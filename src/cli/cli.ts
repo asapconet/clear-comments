@@ -66,14 +66,18 @@ SUPPORTED FILES:
 
 export async function handleRestore(backupDir: string): Promise<void> {
   try {
-    console.log(`🔄 Restoring files from backup: ${backupDir}`);
+    console.log(`${get(":repeat;")} Restoring files from backup: ${backupDir}`);
     const result = restoreFromBackup(backupDir);
 
-    console.log(`✅ Restored ${result.restored} files`);
+    console.log(
+      `${get(":white_check_mark:")} Restored ${result.restored} files`
+    );
 
     if (result.errors.length > 0) {
-      logError(`⚠️  ${result.errors.length} errors occurred:`);
-      result.errors.forEach((error) => console.log(`   ${":x:"} ${error}`));
+      console.log(
+        `${get(":warning:")}  ${result.errors.length} errors occurred:`
+      );
+      result.errors.forEach((error) => logError(error));
     }
   } catch (error) {
     logError(
@@ -85,11 +89,8 @@ export async function handleRestore(backupDir: string): Promise<void> {
   }
 }
 
-/**
- * Display processing results
- */
 export function displayResults(stats: ProcessingStats, verbose: boolean): void {
-  console.log(`\n📊 Summary:`);
+  console.log(`\n${get("bar_chart")} Summary:`);
   console.log(`   Files scanned: ${stats.totalFiles}`);
   console.log(`   Files modified: ${stats.processedFiles}`);
   console.log(`   Lines removed: ${stats.totalLinesRemoved}`);
@@ -101,24 +102,23 @@ export function displayResults(stats: ProcessingStats, verbose: boolean): void {
   if (stats.errors.length > 0) {
     console.log(`   Errors: ${stats.errors.length}`);
     if (verbose) {
-      stats.errors.forEach((error) => console.error(`   ❌ ${error}`));
+      stats.errors.forEach((error) => logError(`  ${error}`));
     }
   }
 
   if (stats.processedFiles === 0 && stats.errors.length === 0) {
-    console.log(`\n✨ No comments found to remove.`);
+    console.log(`\n${get("sparkles")} No comments found to remove.`);
   } else if (stats.processedFiles > 0) {
-    console.log(`\n🎉 Successfully cleaned ${stats.processedFiles} files!`);
+    console.log(
+      `\n${get("tada")} Successfully cleaned ${stats.processedFiles} files!`
+    );
   }
 }
 
-/**
- * Display startup banner
- */
 export function showBanner(targetDir: string, hasBackup: boolean): void {
-  console.log(`🧹 Clear Comments v1.0.0`);
-  console.log(`📁 Target: ${targetDir}`);
+  console.log(`${get("broom")} Clear Comments v0.1.0`);
+  console.log(`${get("file_folder")} Target: ${targetDir}`);
   if (hasBackup) {
-    console.log(`💾 Backup: Enabled`);
+    console.log(`${get("floppy_disk")} Backup: Enabled`);
   }
 }

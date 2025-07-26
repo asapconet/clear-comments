@@ -1,0 +1,50 @@
+{
+  "name": "clear-comments",
+  "version": "0.1.0",
+  "description": "A fast CLI tool to clear comments from your React/JavaScript projects",
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "scripts": {
+    "build": "tsc",
+    "dev": "tsc --watch",
+    "test": "npm run build && node dist/test/executioner.js",
+    "prepublishOnly": "npm run build",
+    "clean": "rimraf dist"
+  },
+  "dependencies": {
+    "@types/node": "^24.1.0",
+    "glob": "^11.0.3",
+    "node-emoji": "^2.2.0",
+    "rimraf": "^6.0.1",
+    "typescript": "^5.8.3"
+  },
+  "engines": {
+    "node": ">=14.0.0"
+  },
+  "keywords": [
+    "clean-code",
+    "comments",
+    "react",
+    "javascript",
+    "typescript",
+    "jsx",
+    "tsx",
+    "cli",
+    "build-tool"
+  ],
+  "files": [
+    "dist/**/*",
+    "README.md",
+    "LICENSE"
+  ],
+  "author": "aaron sunday",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/asapconet/clear-comments.git"
+  },
+  "bugs": {
+    "url": "https://github.com/asapconet/clear-comments/issues"
+  },
+  "homepage": "https://github.com/asapconetclear-comments#readme"
+}

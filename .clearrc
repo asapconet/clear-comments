@@ -1,0 +1,5 @@
+{
+  "preserveJSDoc": true,
+  "removeTypes": ["single-line", "multi-line", "html"],
+  "customPatterns": ["/\\*\\s*TODO.*?\\*/"]
+}

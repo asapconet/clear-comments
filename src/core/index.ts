@@ -1,53 +1,69 @@
+import { get } from "node-emoji";
 import { getFilesToProcess, processFiles } from "./fileProcessor";
+import { createBackupManifest } from "../utils/backupHandler";
+import { loadConfig, mergeConfigWithOptions } from "../config/loader";
 import { DEFAULT_OPTIONS } from "../config/constants";
 import { ClearCommentsOptions, ProcessingStats } from "../types";
-import { get } from "node-emoji";
 
-// This big guy dey run the main show to clear comments from the whole project
+/**
+ * This function handles the entire project cleanup — it removes all matched comments from files.
+ */
 export async function clearComments(
   options: ClearCommentsOptions = {}
 ): Promise<ProcessingStats> {
+  // Load config file if the user provide am
+  const config = loadConfig(options.configPath);
+
+  // Join config from file and options from CLI
+  const finalOptions = mergeConfigWithOptions(config, options);
+
   const {
     targetDir = DEFAULT_OPTIONS.targetDir,
-    excludePatterns = DEFAULT_OPTIONS.excludePatterns,
+    excludePatterns = [...DEFAULT_OPTIONS.excludePatterns],
     verbose = DEFAULT_OPTIONS.verbose,
-    preserveJSDoc = DEFAULT_OPTIONS.preserveJSDoc,
-  } = options;
+    backup = false,
+    backupDir = "./.backup",
+  } = finalOptions;
 
-  // If you wan make am loud, e go show you wetin e dy do with some emoji swag
+  // If verbose mode dey enabled, we go log the steps with emoji vibes
   if (verbose) {
+    console.log(`${get("broom")} Clearing comments from: ${targetDir}`);
     console.log(
-      `${get("broom")} Clearing comments from project in: ${targetDir}`
+      `${get("memo")} Comment types to remove: ${
+        finalOptions.removeTypes?.join(", ") || "default"
+      }`
     );
-    console.log(
-      `${get("clipboard")} Keep JSDoc? ${preserveJSDoc ? "Yes" : "No"}`
-    );
+    if (finalOptions.customPatterns?.length) {
+      console.log(
+        `${get("mag")} Custom patterns count: ${finalOptions.customPatterns.length}`
+      );
+    }
+    if (backup) {
+      console.log(`${get("floppy_disk")} Backups will be saved to: ${backupDir}`);
+    }
   }
 
   try {
-    // This one dy gather all the files wey we go work on
-    const excludePatterns = [
-      ...(options.excludePatterns ?? DEFAULT_OPTIONS.excludePatterns),
-    ];
-
+    // Gather all files wey match
     const files = await getFilesToProcess(targetDir, excludePatterns);
 
-    // Now we dey process all those files sharp
-    const stats = await processFiles(files, targetDir, {
-      preserveJSDoc,
-      verbose,
-      excludePatterns,
-    });
+    // If backup dey on and we get files, we go backup
+    if (backup && files.length > 0) {
+      createBackupManifest(backupDir, files);
+    }
+
+    // Process the files to remove comments
+    const stats = await processFiles(files, targetDir, finalOptions);
 
     return stats;
   } catch (error) {
-    // If something scatter, we go catch am and report the mata
+    // If wahala burst, catch am here
     const errorMessage = error instanceof Error ? error.message : String(error);
     return {
       totalFiles: 0,
       processedFiles: 0,
       totalLinesRemoved: 0,
-      //  If big bege dy groud?
+      backupsCreated: 0,
       errors: [`Global error:: ${errorMessage}`],
     };
   }

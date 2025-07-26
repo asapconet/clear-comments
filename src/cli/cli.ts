@@ -1,74 +1,79 @@
-import { clearComments } from "../core";
-import { logError, logVerbose } from "../utils/logger";
+import { get } from "node-emoji";
+import { CLIArgs, ProcessingStats } from "../types";
+import { restoreFromBackup } from "../utils/backupHandler";
+import { logError } from "../utils/logger";
 
-function parseArgs(args: string[]): {
-  targetDir: string;
-  verbose: boolean;
-  preserveJSDoc: boolean;
-  help: boolean;
-} {
+export function parseArgs(args: string[]): CLIArgs {
+  const targetDir = args.find((arg) => !arg.startsWith("-")) || process.cwd();
+
   return {
-    targetDir: process.cwd(),
-    verbose: args.includes("--verbose"),
+    targetDir,
+    verbose: args.includes("--verbose") || args.includes("-v"),
     preserveJSDoc: !args.includes("--no-jsdoc"),
-    help: args.includes("--help"),
+    backup: args.includes("--backup"),
+    backupDir: getArgValue(args, "--backup-dir") || "./.backup",
+    configPath: getArgValue(args, "--config"),
+    help: args.includes("--help") || args.includes("-h"),
+    restore: getArgValue(args, "--restore"),
   };
 }
 
-function showHelp(): void {
+function getArgValue(args: string[], flag: string): string | undefined {
+  const index = args.indexOf(flag);
+  return index !== -1 && index + 1 < args.length ? args[index + 1] : undefined;
+}
+
+export function showHelp(): void {
   console.log(`
-    Usage: comment-cleaner [options]
+  ${get(":broom:")} Clear Comments v1.0.0
 
-    Options:
-      --target-dir <path>    Directory to clean (default: current directory)
-      --verbose             Show detailed output
-      --no-jsdoc            Remove JSDoc comments too
-      --help                Show this help message
-  `);
-}
+USAGE:
+  clear-comments [directory] [options]
 
-function showBanner(targetDir: string): void {
-  logVerbose(`Comment Cleaner starting for: ${targetDir}`);
-}
+ARGUMENTS:
+  directory         Target directory to process (default: current directory)
 
-function displayResults(
-  stats: import("../types").ProcessingStats,
-  verbose: boolean
-): void {
-  if (verbose) {
-    logVerbose(`Total files scanned: ${stats.totalFiles}`);
-    logVerbose(`Files modified: ${stats.processedFiles}`);
-    logVerbose(`Lines removed: ${stats.totalLinesRemoved}`);
-    if (stats.errors.length > 0) {
-      logError(`Errors encountered: ${stats.errors.length}`);
-      stats.errors.forEach((error) => logError(error));
-    }
-  }
-}
+OPTIONS:
+  -v, --verbose     Show detailed output
+  --no-jsdoc        Remove JSDoc comments as well
+  --backup          Create backup before processing
+  --backup-dir      Backup directory (default: ./.backup)
+  --config          Path to configuration file
+  --restore <dir>   Restore files from backup directory
+  -h, --help        Show this help message
 
-// This be the main gate wey the CLI dey pass through
-export async function cli(): Promise<void> {
-  const args = process.argv.slice(2);
-  const parsedArgs = parseArgs(args);
-  if (parsedArgs.help) {
-    showHelp();
-    return;
+CONFIGURATION FILE:
+  Create .clearrc or clear-comments.config.json:
+  {
+    "preserveJSDoc": true,
+    "removeTypes": ["single-line", "multi-line", "html"],
+    "customPatterns": ["/\\\\*\\\\s*TODO.*?\\\\*/"],
+    "backup": true,
+    "backupDir": "./.backup"
   }
 
-  // Flash the startup banner make everybody see say we don land
-  showBanner(parsedArgs.targetDir);
+EXAMPLES:
+  clear-comments                          # Process current directory
+  clear-comments ./src                    # Process src directory
+  clear-comments --verbose --backup       # Process with backup and verbose output
+  clear-comments --config .clearrc        # Use custom config file
+  clear-comments --restore ./.backup      # Restore from backup
 
+SUPPORTED FILES:
+  .js, .jsx, .ts, .tsx
+`);
+}
+
+export async function handleRestore(backupDir: string): Promise<void> {
   try {
-    const stats = await clearComments({
-      targetDir: parsedArgs.targetDir,
-      verbose: parsedArgs.verbose,
-      preserveJSDoc: parsedArgs.preserveJSDoc,
-    });
+    console.log(`🔄 Restoring files from backup: ${backupDir}`);
+    const result = restoreFromBackup(backupDir);
 
-    displayResults(stats, parsedArgs.verbose);
+    console.log(`✅ Restored ${result.restored} files`);
 
-    if (stats.errors.length > 0) {
-      process.exit(1);
+    if (result.errors.length > 0) {
+      logError(`⚠️  ${result.errors.length} errors occurred:`);
+      result.errors.forEach((error) => console.log(`   ${":x:"} ${error}`));
     }
   } catch (error) {
     logError(
@@ -77,5 +82,43 @@ export async function cli(): Promise<void> {
       }`
     );
     process.exit(1);
+  }
+}
+
+/**
+ * Display processing results
+ */
+export function displayResults(stats: ProcessingStats, verbose: boolean): void {
+  console.log(`\n📊 Summary:`);
+  console.log(`   Files scanned: ${stats.totalFiles}`);
+  console.log(`   Files modified: ${stats.processedFiles}`);
+  console.log(`   Lines removed: ${stats.totalLinesRemoved}`);
+
+  if (stats.backupsCreated > 0) {
+    console.log(`   Backups created: ${stats.backupsCreated}`);
+  }
+
+  if (stats.errors.length > 0) {
+    console.log(`   Errors: ${stats.errors.length}`);
+    if (verbose) {
+      stats.errors.forEach((error) => console.error(`   ❌ ${error}`));
+    }
+  }
+
+  if (stats.processedFiles === 0 && stats.errors.length === 0) {
+    console.log(`\n✨ No comments found to remove.`);
+  } else if (stats.processedFiles > 0) {
+    console.log(`\n🎉 Successfully cleaned ${stats.processedFiles} files!`);
+  }
+}
+
+/**
+ * Display startup banner
+ */
+export function showBanner(targetDir: string, hasBackup: boolean): void {
+  console.log(`🧹 Clear Comments v1.0.0`);
+  console.log(`📁 Target: ${targetDir}`);
+  if (hasBackup) {
+    console.log(`💾 Backup: Enabled`);
   }
 }

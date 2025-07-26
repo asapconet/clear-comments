@@ -1,7 +1,12 @@
 import * as fs from "fs";
 import * as path from "path";
 import { glob } from "glob";
-import { removeComments, isSupportedExtension } from "./commentRemover";
+import {
+  removeComments,
+  isSupportedExtension,
+  convertLegacyOptions,
+} from "./commentRemover";
+import { createFileBackup } from "../utils/backupHandler";
 import { SUPPORTED_EXTENSIONS, EXCLUDE_PATTERNS } from "../config/constants";
 import {
   ClearCommentsOptions,
@@ -30,20 +35,48 @@ export async function processFile(
     }
 
     const originalLines = content.split("\n").length;
+
+    // this guy go check which comment type we go commot
+    let removeTypes = options.removeTypes;
+    if (!removeTypes) {
+      // If e no specify, we go fallback to legacy preserveJSDoc
+      removeTypes = convertLegacyOptions(options.preserveJSDoc);
+    }
+
     const cleanedContent = removeComments(
       content,
       fileExtension,
-      options.preserveJSDoc
+      removeTypes,
+      options.customPatterns || []
     );
     const newLines = cleanedContent.split("\n").length;
 
     // We go only write back if something change for the file
     if (cleanedContent !== content) {
+      let backupPath: string | undefined;
+
+      // If you wan run backup, this guy go create am
+      if (options.backup && options.backupDir) {
+        const backupResult = createFileBackup(filePath, options.backupDir);
+        if (backupResult.success) {
+          backupPath = backupResult.backupPath;
+        } else {
+          return {
+            wasModified: false,
+            originalLines,
+            newLines,
+            error: `Backup fail: ${backupResult.error}`,
+          };
+        }
+      }
+
       fs.writeFileSync(filePath, cleanedContent, "utf8");
+
       return {
         wasModified: true,
         originalLines,
         newLines,
+        backupPath,
       };
     }
 
@@ -72,6 +105,7 @@ export async function getFilesToProcess(
     path.join(targetDir, `**/*${ext}`).replace(/\\/g, "/")
   );
 
+  // Join default exclude with the one wey user pass
   const allExcludePatterns = [...EXCLUDE_PATTERNS, ...excludePatterns];
 
   const allFiles: string[] = [];
@@ -97,6 +131,7 @@ export async function processFiles(
     totalFiles: 0,
     processedFiles: 0,
     totalLinesRemoved: 0,
+    backupsCreated: 0,
     errors: [],
   };
 
@@ -121,12 +156,17 @@ export async function processFiles(
       const linesRemoved = result.originalLines - result.newLines;
       stats.totalLinesRemoved += linesRemoved;
 
+      if (result.backupPath) {
+        stats.backupsCreated++;
+      }
+
       if (options.verbose) {
+        const backupInfo = result.backupPath ? " (backup created)" : "";
         console.log(
           `${get("white_check_mark")} Cleaned: ${path.relative(
             targetDir,
             file
-          )} (${linesRemoved} lines removed)`
+          )} (${linesRemoved} lines removed)${backupInfo}`
         );
       }
     } else if (options.verbose) {
@@ -134,7 +174,7 @@ export async function processFiles(
         `${get("fast_forward")} Skipped: ${path.relative(
           targetDir,
           file
-        )} (no comments found)`
+        )} (no comment to remove)`
       );
     }
   }

@@ -9,6 +9,7 @@
     "dev": "tsc --watch",
     "test": "npm run build && node dist/test/executioner.js",
     "prepublishOnly": "npm run build",
+    "clear-comments": "clear-comments --config .clearrc",
     "clean": "rimraf dist"
   },
   "dependencies": {

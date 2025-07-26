@@ -15,7 +15,7 @@ export function parseArgs(args: string[]): CLIArgs {
     configPath: getArgValue(args, "--config"),
     help: args.includes("--help") || args.includes("-h"),
     restore: getArgValue(args, "--restore"),
-    preserveEmptyLines: args.includes("--preserve-empty-lines"),
+    removeEmptyLines: args.includes("--remove-empty-lines"),
   };
 }
 
@@ -41,7 +41,7 @@ OPTIONS:
   --backup-dir      Backup directory (default: ./.backup)
   --config          Path to configuration file
   --restore <dir>   Restore files from backup directory
-  --preserve-empty-lines   Keep empty lines after comment removal
+  --remove-empty-lines   Removes empty lines after comment removal
 
   -h, --help        Show this help message
 

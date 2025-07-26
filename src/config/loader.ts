@@ -9,7 +9,7 @@ export interface ConfigFile {
   backup?: boolean;
   backupDir?: string;
   verbose?: boolean;
-  preserveEmptyLines: boolean;
+  removeEmptyLines: boolean;
 }
 
 export const DEFAULT_CONFIG: ConfigFile = {
@@ -19,7 +19,7 @@ export const DEFAULT_CONFIG: ConfigFile = {
   excludePatterns: [],
   backup: false,
   backupDir: "./.backup",
-  preserveEmptyLines: false,
+  removeEmptyLines: false,
 };
 
 export function loadConfig(configPath?: string): ConfigFile {
@@ -54,8 +54,8 @@ export function mergeConfigWithOptions(
     ...cliOptions,
     removeTypes: cliOptions.removeTypes || config.removeTypes,
     customPatterns: cliOptions.customPatterns || config.customPatterns,
-    preserveEmptyLines:
-      cliOptions.preserveEmptyLines ?? config.preserveEmptyLines ?? false,
+    removeEmptyLines:
+      cliOptions.removeEmptyLines ?? config.removeEmptyLines ?? false,
     excludePatterns: [
       ...(config.excludePatterns || []),
       ...(cliOptions.excludePatterns || []),

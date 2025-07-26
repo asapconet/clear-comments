@@ -5,6 +5,7 @@ A fast and focused CLI tool to remove comments from your React/JavaScript projec
 ## 🎯 Why Clear Comments?
 
 ### **Perfect For:**
+
 - **Client Deliveries**: Ship clean, professional code without internal comments
 - **Production Builds**: Remove comments before deployment when bundlers aren't suitable
 - **Educational Materials**: Create clean code examples for tutorials or documentation
@@ -13,6 +14,7 @@ A fast and focused CLI tool to remove comments from your React/JavaScript projec
 - **Quick Cleanup**: Simple comment removal without complex build pipeline setup
 
 ### **Real Value:**
+
 - ⚡ **Fast Processing**: Handles large codebases in seconds
 - 🎯 **Surgical Precision**: Removes only comments, preserves JSDoc by default
 - 🔧 **Zero Configuration**: Works out of the box with sensible defaults
@@ -22,6 +24,7 @@ A fast and focused CLI tool to remove comments from your React/JavaScript projec
 ## ⚠️ Important Considerations
 
 **You might NOT need this tool if:**
+
 - ✅ Your bundler (Webpack, Vite, Rollup) already handles comment removal
 - ✅ You're using minification tools (Terser, UglifyJS) in your build process
 - ✅ Comments are valuable for code maintenance in your workflow
@@ -32,11 +35,13 @@ A fast and focused CLI tool to remove comments from your React/JavaScript projec
 ## Installation
 
 ### Global Installation (Recommended)
+
 ```bash
 npm install -g clear-comments
 ```
 
 ### Local Installation
+
 ```bash
 npm install clear-comments --save-dev
 ```
@@ -46,32 +51,44 @@ npm install clear-comments --save-dev
 ### Command Line
 
 **Clear comments in current directory:**
+
 ```bash
 clear-comments
 ```
 
 **Clear comments in specific directory:**
+
 ```bash
 clear-comments ./src
 ```
 
 **With verbose output:**
+
 ```bash
 clear-comments --verbose
 clear-comments ./src -v
 ```
 
 **Remove JSDoc comments too:**
+
 ```bash
 clear-comments --no-jsdoc
 ```
 
+**Remove all extra empty lines:**
+
+```bash
+clear-comments ./src --no-jsdoc --remove-empty-lines true
+```
+
 **Show help:**
+
 ```bash
 clear-comments --help
 ```
 
 **Using with npx (no installation required):**
+
 ```bash
 npx clear-comments
 npx clear-comments ./src --verbose
@@ -80,6 +97,7 @@ npx clear-comments ./src --verbose
 ### Build Integration Examples
 
 **In package.json scripts:**
+
 ```json
 {
   "scripts": {
@@ -91,6 +109,7 @@ npx clear-comments ./src --verbose
 ```
 
 **In CI/CD pipeline:**
+
 ```yaml
 - name: Clean comments for production
   run: npx clear-comments ./src --no-jsdoc
@@ -106,6 +125,7 @@ const stats = await clearComments({
   targetDir: './src',
   verbose: true,
   preserveJSDoc: true,
+  removeEmptyLines:false,
   excludePatterns: ['**/generated/**']
 });
 
@@ -113,12 +133,14 @@ console.log(`Processed ${stats.processedFiles} files`);
 console.log(`Removed ${stats.totalLinesRemoved} lines of comments`);
 
 // Remove comments from a string
-const cleanCode = removeComments(sourceCode, '.tsx', true);
+const cleanCode = removeComments(sourceCode, '.tsx', true {
+  removeEmptyLines: true
+});
 ```
 
 ```javascript
 // CommonJS usage
-const { clearComments, removeComments } = require('clear-comments');
+const { clearComments, removeComments } = require("clear-comments");
 
 // Same API as above
 ```
@@ -129,6 +151,7 @@ const { clearComments, removeComments } = require('clear-comments');
 - ✅ Removes multi-line comments (`/* comment */`)
 - ✅ Removes JSX comments (`{/* comment */}`)
 - ✅ Removes HTML comments (`<!-- comment -->`)
+- ✅ Preserves empty lines by default ✅ (new)
 - ✅ Preserves JSDoc comments (`/** comment */`) by default
 - ✅ Supports JavaScript (`.js`)
 - ✅ Supports TypeScript (`.ts`)
@@ -149,6 +172,7 @@ const { clearComments, removeComments } = require('clear-comments');
 ## Use Cases & Examples
 
 ### **Client Delivery Scenario**
+
 ```bash
 # Before delivering to client, clean up internal comments
 clear-comments ./project-src --verbose
@@ -156,6 +180,7 @@ clear-comments ./project-src --verbose
 ```
 
 ### **Educational Content Preparation**
+
 ```bash
 # Prepare clean examples for tutorial
 clear-comments ./tutorial-code --no-jsdoc
@@ -163,6 +188,7 @@ clear-comments ./tutorial-code --no-jsdoc
 ```
 
 ### **Legacy Project Cleanup**
+
 ```bash
 # Clean up old codebase before modernization
 clear-comments ./legacy-app --verbose
@@ -172,12 +198,13 @@ clear-comments ./legacy-app --verbose
 ### Code Transformation Example
 
 **Before:**
+
 ```javascript
 // This is a component for user authentication [comment way we go comot]
 function MyComponent() {
-  /* State management for login form [comment way we go comot] */ 
+  /* State management for login form [comment way we go comot] */
   const [count, setCount] = useState(0); // Counter state [comment way we go comot]
-  
+
   /**
    * Handles user login
    * @param credentials User login data
@@ -186,7 +213,7 @@ function MyComponent() {
     // TODO: Add validation [comment way go comot]
     return authenticate(credentials);
   };
-  
+
   return (
     <div>
       {/* JSX comment - login form [comment way go comot]*/}
@@ -198,25 +225,22 @@ function MyComponent() {
 ```
 
 **After (with JSDoc preservation):**
+
 ```javascript
 function MyComponent() {
-  
-  const [count, setCount] = useState(0); 
-  
+  const [count, setCount] = useState(0);
+
   /**
    * Handles user login [comment way no we no comot]
-   * @param credentials User login data 
+   * @param credentials User login data
    */
   const handleLogin = (credentials) => {
-    
     return authenticate(credentials);
   };
-  
+
   return (
     <div>
-      
       <h1>Count: {count}</h1>
-      
     </div>
   );
 }
@@ -225,6 +249,7 @@ function MyComponent() {
 ## Development
 
 ### Setup
+
 ```bash
 git clone https://github.com/asapcone/clear-comments.git
 cd clear-comments
@@ -232,40 +257,47 @@ npm install
 ```
 
 ### Build
+
 ```bash
 npm run build
 ```
 
 ### Development Mode (watch for changes)
+
 ```bash
 npm run dev
 ```
 
 ### Run Tests
+
 ```bash
 npm test
 ```
 
 ### Clean Build Artifacts
+
 ```bash
 npm run clean
 ```
 
 ## CLI Options
 
-| Option | Description | Default |
-|--------|-------------|---------|
-| `directory` | Target directory to process | Current directory |
-| `--verbose, -v` | Show detailed processing output | `false` |
-| `--no-jsdoc` | Remove JSDoc comments as well | Preserves JSDoc |
-| `--help, -h` | Show help information | - |
+| Option          | Description                     | Default           |
+| --------------- | ------------------------------- | ----------------- |
+| `directory`     | Target directory to process     | Current directory |
+| `--verbose, -v` | Show detailed processing output | `false`           |
+| `--no-jsdoc`    | Remove JSDoc comments as well   | Preserves JSDoc   |
+| `--help, -h`    | Show help information           | -                 |
+| `--remove-empty-lines [true false]`  | Preserve or remove blank lines | False |
 
 ## Programmatic API
 
 ### `clearComments(options)`
+
 Main function to process files in a directory.
 
 **Options:**
+
 - `targetDir?: string` - Directory to process
 - `preserveJSDoc?: boolean` - Keep JSDoc comments (default: true)
 - `verbose?: boolean` - Detailed logging (default: false)
@@ -274,9 +306,11 @@ Main function to process files in a directory.
 **Returns:** `Promise<ProcessingStats>`
 
 ### `removeComments(content, extension, preserveJSDoc)`
+
 Remove comments from a string of code.
 
 **Parameters:**
+
 - `content: string` - Source code content
 - `extension: '.js' | '.jsx' | '.ts' | '.tsx'` - File extension
 - `preserveJSDoc: boolean` - Whether to preserve JSDoc
@@ -309,11 +343,25 @@ MIT License - see the [LICENSE](LICENSE) file for details.
 ## Author
 
 **Aaron Sunday**
+
 - GitHub: [@asapconet](https://github.com/asapconet)
 
 ## Changelog
 
+### 0.1.2 (Latest)
+
+- 🆕 Remove  Empty Lines by Default
+
+- ➕ Added --preserve-empty-lines CLI option
+
+- 🛠 Improved merging of CLI options and config
+
+### 0.1.1
+
+- 🔧 Update executable file
+
 ### 0.1.0
+
 - Initial release
 - Support for JS, JSX, TS, TSX files
 - CLI interface with verbose mode

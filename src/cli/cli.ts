@@ -119,7 +119,7 @@ export function displayResults(stats: ProcessingStats, verbose: boolean): void {
 }
 
 export function showBanner(targetDir: string, hasBackup: boolean): void {
-  console.log(`${get("broom")} Clear Comments v0.1.0`);
+  console.log(`${get("broom")} Clear Comments v0.1.2`);
   console.log(`${get("file_folder")} Target: ${targetDir}`);
   if (hasBackup) {
     console.log(`${get("floppy_disk")} Backup: Enabled`);

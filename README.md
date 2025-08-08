@@ -251,7 +251,7 @@ function MyComponent() {
 ### Setup
 
 ```bash
-git clone https://github.com/asapcone/clear-comments.git
+git clone https://github.com/asapconet/clear-comments.git
 cd clear-comments
 npm install
 ```
